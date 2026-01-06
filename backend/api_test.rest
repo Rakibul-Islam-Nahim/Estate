@@ -1,0 +1,67 @@
+### Register User
+POST http://127.0.0.1:8000/api/register
+Content-Type: application/json
+
+{
+  "username": "rakib",
+  "email": "rakib@example.com",
+  "password": "1234"
+}
+
+### Login
+POST http://127.0.0.1:8000/api/login
+Content-Type: application/json
+
+{
+  "username": "rakib",
+  "password": "1234"
+}
+
+### Add New Property
+POST http://127.0.0.1:8000/api/properties
+Content-Type: application/json
+
+{
+  "title": "Nice Apartment",
+  "location": "Dhaka",
+  "price": 120000,
+  "description": "2 bed, 2 bath"
+}
+
+### Get All Properties
+GET http://127.0.0.1:8000/api/properties
+
+
+### Update Property
+PUT http://127.0.0.1:8000/api/properties/1
+Content-Type: application/json
+
+{
+  "price": 130000
+}
+
+### Delete Property
+DELETE http://127.0.0.1:8000/api/properties/1
+
+
+### Recommend Properties (ML)
+POST http://127.0.0.1:8000/api/recommend
+Content-Type: application/json
+
+{
+  "preferences": {
+    "location": "Dhaka",
+    "max_price": 180000
+  }
+}
+
+### Predict Price (ML)
+POST http://127.0.0.1:8000/api/predict_price
+Content-Type: application/json
+
+{
+  "features": ["location", "size", "bedrooms"]
+}
+
+### Health Check
+GET http://127.0.0.1:8000/api/health
