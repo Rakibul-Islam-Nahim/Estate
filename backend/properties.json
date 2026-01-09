@@ -8,7 +8,14 @@
     "bedrooms": 4,
     "bathrooms": 3,
     "price": 4500000,
-    "description": "Luxury villa with modern amenities"
+    "description": "Luxury villa with modern amenities",
+    "owner": {
+      "id": "seller_bot_1",
+      "type": "bot",
+      "name": "Dhaka Prime Realty",
+      "email": "dhaka.bot@estatehub.com",
+      "phone": "+8801700000001"
+    }
   },
   {
     "id": 2,
@@ -19,7 +26,14 @@
     "bedrooms": 3,
     "bathrooms": 2,
     "price": 3200000,
-    "description": "Modern apartment complex with parking"
+    "description": "Modern apartment complex with parking",
+    "owner": {
+      "id": "seller_bot_2",
+      "type": "bot",
+      "name": "Cox Seaside Holdings",
+      "email": "cox.bot@estatehub.com",
+      "phone": "+8801700000002"
+    }
   },
   {
     "id": 3,
@@ -30,7 +44,14 @@
     "bedrooms": 5,
     "bathrooms": 4,
     "price": 5800000,
-    "description": "Beachside property with sea view"
+    "description": "Beachside property with sea view",
+    "owner": {
+      "id": "seller_bot_2",
+      "type": "bot",
+      "name": "Cox Seaside Holdings",
+      "email": "cox.bot@estatehub.com",
+      "phone": "+8801700000002"
+    }
   },
   {
     "id": 4,
@@ -41,7 +62,14 @@
     "bedrooms": 3,
     "bathrooms": 2,
     "price": 2500000,
-    "description": "Beautiful lake view property"
+    "description": "Beautiful lake view property",
+    "owner": {
+      "id": "seller_bot_1",
+      "type": "bot",
+      "name": "Dhaka Prime Realty",
+      "email": "dhaka.bot@estatehub.com",
+      "phone": "+8801700000001"
+    }
   },
   {
     "id": 5,
@@ -52,7 +80,14 @@
     "bedrooms": 2,
     "bathrooms": 1,
     "price": 1800000,
-    "description": "Commercial property for business"
+    "description": "Commercial property for business",
+    "owner": {
+      "id": "seller_bot_3",
+      "type": "bot",
+      "name": "Heritage City Builders",
+      "email": "heritage.bot@estatehub.com",
+      "phone": "+8801700000003"
+    }
   },
   {
     "id": 6,
@@ -63,6 +98,13 @@
     "bedrooms": 2,
     "bathrooms": 1,
     "price": 1500000,
-    "description": "Modern residential apartment"
+    "description": "Modern residential apartment",
+    "owner": {
+      "id": "seller_bot_3",
+      "type": "bot",
+      "name": "Heritage City Builders",
+      "email": "heritage.bot@estatehub.com",
+      "phone": "+8801700000003"
+    }
   }
 ]

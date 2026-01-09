@@ -3,7 +3,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ContributionPage extends StatefulWidget {
-  const ContributionPage({super.key});
+  final String ownerName;
+  final String ownerEmail;
+
+  const ContributionPage({
+    super.key,
+    required this.ownerName,
+    required this.ownerEmail,
+  });
 
   @override
   State<ContributionPage> createState() => _ContributionPageState();
@@ -57,6 +64,13 @@ class _ContributionPageState extends State<ContributionPage> {
           'bathrooms': int.parse(bathroomsController.text),
           'price': int.parse(priceController.text),
           'description': descriptionController.text,
+          'owner': {
+            'type': 'user',
+            'name': widget.ownerName.isNotEmpty
+                ? widget.ownerName
+                : 'Community Contributor',
+            'email': widget.ownerEmail,
+          },
         }),
       );
 

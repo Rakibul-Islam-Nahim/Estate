@@ -407,6 +407,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         color: Color(0xFF32CD32),
                       ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Owner: ${property['owner']?['name'] ?? 'N/A'}',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    ),
                   ],
                 ),
               ),
@@ -538,6 +543,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       'bathrooms': int.parse(bathroomsController.text),
                       'price': int.parse(priceController.text),
                       'description': descriptionController.text,
+                      'owner': {
+                        'type': 'admin',
+                        'name': 'Admin Listings',
+                        'email': 'admin@real_state.com',
+                      },
                     }),
                   );
 

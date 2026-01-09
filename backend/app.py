@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 import json
 import os
+import random
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -8,6 +10,30 @@ users = []
 properties = []
 transactions = []
 ml_metadata = []
+system_sellers = [
+    {
+        "id": "seller_bot_1",
+        "type": "bot",
+        "name": "Dhaka Prime Realty",
+        "email": "dhaka.bot@estatehub.com",
+        "phone": "+8801700000001",
+    },
+    {
+        "id": "seller_bot_2",
+        "type": "bot",
+        "name": "Cox Seaside Holdings",
+        "email": "cox.bot@estatehub.com",
+        "phone": "+8801700000002",
+    },
+    {
+        "id": "seller_bot_3",
+        "type": "bot",
+        "name": "Heritage City Builders",
+        "email": "heritage.bot@estatehub.com",
+        "phone": "+8801700000003",
+    },
+]
+chats = {}
 
 # Load properties from JSON file on startup
 def load_properties():
@@ -22,6 +48,8 @@ def load_properties():
         if os.path.exists(json_path):
             with open(json_path, 'r') as f:
                 properties = json.load(f)
+            for idx, prop in enumerate(properties):
+                ensure_owner(prop, idx)
             print(f"✓ Loaded {len(properties)} properties from JSON")
         else:
             print(f"✗ File not found at {json_path}")
@@ -66,6 +94,69 @@ def find_property(pid):
         if p["id"] == pid:
             return p
     return None
+
+
+def get_seller_by_id(seller_id):
+    for seller in system_sellers:
+        if seller.get("id") == seller_id:
+            return seller.copy()
+    return None
+
+
+def ensure_owner(prop, index=0):
+    owner = prop.get("owner")
+    if isinstance(owner, dict) and owner.get("name"):
+        if "type" not in owner:
+            owner["type"] = "bot"
+        return owner
+    fallback = system_sellers[index % len(system_sellers)].copy()
+    prop["owner"] = fallback
+    return fallback
+
+
+def get_user_by_email(email):
+    for user in users:
+        if user.get("email") == email:
+            return user
+    return None
+
+
+def chat_key(property_id, user_email):
+    return f"{property_id}:{(user_email or '').lower()}"
+
+
+@app.route("/api/chat", methods=["GET"])
+def list_chats():
+    user_email = request.args.get("user_email")
+    if not user_email:
+        return jsonify({"error": "user_email query parameter is required"}), 400
+
+    user = get_user_by_email(user_email)
+    if not user:
+        return jsonify({"error": "User must exist to list chats"}), 403
+
+    user_email_norm = user_email.lower()
+    sessions = []
+    for key, msgs in chats.items():
+        try:
+            pid_str, email_key = key.split(":", 1)
+            if email_key != user_email_norm:
+                continue
+            pid = int(pid_str)
+        except Exception:
+            continue
+
+        prop = find_property(pid)
+        if not prop:
+            continue
+        last_msg = msgs[-1] if msgs else None
+        sessions.append({
+            "property_id": pid,
+            "property": prop,
+            "last_message": last_msg,
+        })
+
+    return jsonify({"sessions": sessions}), 200
 
 
 
@@ -120,6 +211,9 @@ def logout():
 @app.route("/api/properties", methods=["GET"])
 def list_properties():
     # support optional filters
+    global properties
+    if not properties:
+        load_properties()
     filtered = properties
     location = request.args.get("location")
     if location:
@@ -140,6 +234,17 @@ def add_property():
     
     # Generate new ID
     data["id"] = max([p.get("id", 0) for p in properties] + [0]) + 1
+    owner_info = data.get("owner")
+    if not isinstance(owner_info, dict) or not owner_info.get("name"):
+        owner_info = {
+            "type": "system",
+            "name": "Marketplace Bot",
+            "email": "hello@estatehub.com",
+        }
+    if "type" not in owner_info:
+        owner_info["type"] = "user"
+    data["owner"] = owner_info
+    ensure_owner(data, len(properties))
     properties.append(data)
     return jsonify({"message": "Property added", "property": data}), 201
 
@@ -235,6 +340,57 @@ def ban_user():
         banned_users.append(email)
         return jsonify({"message": f"User {email} has been banned"}), 200
     return jsonify({"error": "Invalid request or user already banned"}), 400
+
+
+@app.route("/api/chat/<int:pid>", methods=["GET"])
+def get_chat(pid):
+    user_email = request.args.get("user_email")
+    if not user_email:
+        return jsonify({"error": "user_email query parameter is required"}), 400
+
+    user = get_user_by_email(user_email)
+    if not user:
+        return jsonify({"error": "User must exist to start a chat"}), 403
+
+    prop = find_property(pid)
+    if not prop:
+        return jsonify({"error": "Property not found"}), 404
+
+    key = chat_key(pid, user_email)
+    return jsonify({
+        "messages": chats.get(key, []),
+        "owner": prop.get("owner"),
+        "property": prop,
+    }), 200
+
+
+@app.route("/api/chat/<int:pid>", methods=["POST"])
+def add_chat_message(pid):
+    data = request.json or {}
+    user_email = data.get("user_email")
+    message = (data.get("message") or "").strip()
+
+    if not user_email or not message:
+        return jsonify({"error": "user_email and message are required"}), 400
+
+    user = get_user_by_email(user_email)
+    if not user:
+        return jsonify({"error": "User must exist to send messages"}), 403
+
+    prop = find_property(pid)
+    if not prop:
+        return jsonify({"error": "Property not found"}), 404
+
+    entry = {
+        "sender": user.get("username") or user_email.split("@")[0],
+        "sender_email": user_email,
+        "message": message,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+    key = chat_key(pid, user_email)
+    chats.setdefault(key, []).append(entry)
+    return jsonify({"messages": chats[key]}), 201
 
 
 @app.route("/api/admin/users/unban", methods=["POST"])

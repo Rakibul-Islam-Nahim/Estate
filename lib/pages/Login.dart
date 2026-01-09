@@ -48,7 +48,10 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
           Navigator.pushReplacementNamed(
             context,
             '/home',
-            arguments: _emailController.text.split('@')[0],
+            arguments: {
+              'userName': _emailController.text.split('@')[0],
+              'userEmail': _emailController.text,
+            },
           );
         }
       } else {

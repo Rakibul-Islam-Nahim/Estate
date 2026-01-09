@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:real_state/pages/ProfilePage.dart';
 import 'package:real_state/pages/ContributionPage.dart';
+import 'package:real_state/pages/ChatPage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   final String userName;
+  final String userEmail;
 
-  const HomePage({super.key, required this.userName});
+  const HomePage({super.key, required this.userName, required this.userEmail});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,7 +19,9 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   List<dynamic> properties = [];
   List<dynamic> filteredProperties = [];
+  List<dynamic> chatSessions = [];
   bool _isLoading = true;
+  bool _isChatLoading = false;
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
@@ -43,6 +47,7 @@ class _HomePageState extends State<HomePage> {
     _minPriceController.addListener(_filterProperties);
     _maxPriceController.addListener(_filterProperties);
     _loadProperties();
+    _loadChats();
   }
 
   @override
@@ -106,6 +111,26 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _loadChats() async {
+    setState(() => _isChatLoading = true);
+    try {
+      final resp = await http.get(
+        Uri.parse(
+          'http://127.0.0.1:8000/api/chat?user_email=${Uri.encodeComponent(widget.userEmail)}',
+        ),
+      );
+      if (resp.statusCode == 200) {
+        final data = json.decode(resp.body);
+        setState(() {
+          chatSessions = data['sessions'] ?? [];
+        });
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isChatLoading = false);
+    }
+  }
+
   int? _extractPropertyId(Map<String, dynamic> property) {
     final id = property['id'];
     if (id is int) return id;
@@ -113,6 +138,14 @@ class _HomePageState extends State<HomePage> {
       return int.tryParse(id);
     }
     return null;
+  }
+
+  Map<String, dynamic> _ownerOf(Map<String, dynamic> property) {
+    final owner = property['owner'];
+    if (owner is Map<String, dynamic>) {
+      return owner;
+    }
+    return {};
   }
 
   void _toggleFavorite(Map<String, dynamic> property) {
@@ -126,6 +159,30 @@ class _HomePageState extends State<HomePage> {
         favoriteIds.add(propertyId);
       }
     });
+  }
+
+  void _openChat(Map<String, dynamic> property) {
+    final propertyId = _extractPropertyId(property);
+    if (propertyId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to open chat for this property'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatPage(
+          property: property,
+          userName: widget.userName,
+          userEmail: widget.userEmail,
+        ),
+      ),
+    ).then((_) => _loadChats());
   }
 
   @override
@@ -194,13 +251,19 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ContributionPage(),
+                  builder: (context) => ContributionPage(
+                    ownerName: widget.userName,
+                    ownerEmail: widget.userEmail,
+                  ),
                 ),
-              );
+              ).then((_) => _loadProperties());
             } else {
               setState(() {
                 _currentIndex = index;
               });
+              if (index == 2) {
+                _loadChats();
+              }
             }
           },
           type: BottomNavigationBarType.fixed,
@@ -248,10 +311,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (_currentIndex == 2) {
-      return _buildPlaceholderPage(
-        title: 'Chat coming soon',
-        subtitle: 'Conversations and inquiries will appear here.',
-      );
+      return _buildChatList();
     }
 
     return _buildHomeContent();
@@ -341,11 +401,156 @@ class _HomePageState extends State<HomePage> {
               ...favoriteProperties.map((property) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: _buildPropertyCard(property),
+                  child: Column(
+                    children: [
+                      _buildPropertyCard(property),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => _openChat(property),
+                          icon: const Icon(
+                            Icons.chat_bubble,
+                            color: Color(0xFF32CD32),
+                          ),
+                          label: const Text('Chat'),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF32CD32)),
+                            foregroundColor: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }).toList(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildChatList() {
+    if (_isChatLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF32CD32)),
+      );
+    }
+
+    if (chatSessions.isEmpty) {
+      return _buildEmptyState(
+        icon: Icons.chat_bubble_outline,
+        message: 'No chats yet. Start a chat from any property.',
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadChats,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: chatSessions.length,
+        itemBuilder: (context, index) {
+          final session = chatSessions[index];
+          final propertyDynamic = session['property'];
+          final property = propertyDynamic is Map<String, dynamic>
+              ? propertyDynamic
+              : <String, dynamic>{};
+          final owner = _ownerOf(property);
+          final lastMessageDynamic = session['last_message'];
+          final lastMessage = lastMessageDynamic is Map<String, dynamic>
+              ? lastMessageDynamic
+              : <String, dynamic>{};
+          final lastText = (lastMessage['message'] ?? 'No messages yet')
+              .toString();
+          final sender = (lastMessage['sender'] ?? '').toString();
+          final timestamp = lastMessage['timestamp']?.toString();
+
+          return GestureDetector(
+            onTap: () => _openChat(property),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFDCDCDC),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.12),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9ACD32).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.chat_bubble_outline,
+                      color: Color(0xFF32CD32),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          property['title'] ?? 'Property chat',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          property['location'] ?? 'Location not set',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Owner: ${owner['name'] ?? 'Marketplace Seller'}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          sender.isNotEmpty ? '$sender: $lastText' : lastText,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (timestamp != null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, top: 2),
+                      child: Text(
+                        timestamp,
+                        style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -507,6 +712,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildPropertyCard(Map<String, dynamic> property) {
     final propertyId = _extractPropertyId(property);
     final isFavorite = propertyId != null && favoriteIds.contains(propertyId);
+    final owner = _ownerOf(property);
     return GestureDetector(
       onTap: () => _showPropertyDetails(property),
       child: Container(
@@ -552,6 +758,11 @@ class _HomePageState extends State<HomePage> {
                     property['location'] ?? 'No Location',
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Owner: ${owner['name'] ?? 'N/A'}',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
                 ],
               ),
             ),
@@ -587,6 +798,7 @@ class _HomePageState extends State<HomePage> {
 
   void _showPropertyDetails(Map<String, dynamic> property) {
     final propertyId = _extractPropertyId(property);
+    final owner = _ownerOf(property);
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -625,6 +837,14 @@ class _HomePageState extends State<HomePage> {
                     '${property['bathrooms'] ?? 'N/A'} per unit',
                   ),
                   _buildDetailRow('Price', '৳${property['price'] ?? 'N/A'}'),
+                  _buildDetailRow(
+                    'Owner',
+                    owner['name'] ?? 'Marketplace Seller',
+                  ),
+                  if (owner['email'] != null)
+                    _buildDetailRow('Owner Email', owner['email']),
+                  if (owner['phone'] != null)
+                    _buildDetailRow('Owner Phone', owner['phone']),
                   const SizedBox(height: 8),
                   const Text(
                     'Description:',

@@ -34,9 +34,12 @@ class MyApp extends StatelessWidget {
             );
 
           case '/home':
-            final userName = settings.arguments as String? ?? 'User';
+            final args = settings.arguments as Map<String, dynamic>?;
+            final userName = args?['userName'] as String? ?? 'User';
+            final userEmail = args?['userEmail'] as String? ?? '';
             return PageRouteBuilder(
-              pageBuilder: (_, __, ___) => HomePage(userName: userName),
+              pageBuilder: (_, __, ___) =>
+                  HomePage(userName: userName, userEmail: userEmail),
               transitionsBuilder: (_, animation, __, child) =>
                   FadeTransition(opacity: animation, child: child),
             );
