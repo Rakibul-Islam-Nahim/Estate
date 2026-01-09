@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "title": "Adhunik Villa, Banani",
+    "location": "Banani, Dhaka",
+    "total_area": 4500,
+    "total_units": 1,
+    "bedrooms": 4,
+    "bathrooms": 3,
+    "price": 4500000,
+    "description": "Luxury villa with modern amenities"
+  },
+  {
+    "id": 2,
+    "title": "Gulshan Apartment Complex",
+    "location": "Gulshan, Dhaka",
+    "total_area": 35000,
+    "total_units": 10,
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "price": 3200000,
+    "description": "Modern apartment complex with parking"
+  },
+  {
+    "id": 3,
+    "title": "Samudro Saykot Bari",
+    "location": "Cox Bazar",
+    "total_area": 8000,
+    "total_units": 1,
+    "bedrooms": 5,
+    "bathrooms": 4,
+    "price": 5800000,
+    "description": "Beachside property with sea view"
+  },
+  {
+    "id": 4,
+    "title": "Dhanmondi Lake View",
+    "location": "Dhanmondi, Dhaka",
+    "total_area": 3200,
+    "total_units": 1,
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "price": 2500000,
+    "description": "Beautiful lake view property"
+  },
+  {
+    "id": 5,
+    "title": "Mirpur Commercial Plaza",
+    "location": "Mirpur, Dhaka",
+    "total_area": 15000,
+    "total_units": 20,
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "price": 1800000,
+    "description": "Commercial property for business"
+  },
+  {
+    "id": 6,
+    "title": "Uttara Modern Flats",
+    "location": "Uttara, Dhaka",
+    "total_area": 25000,
+    "total_units": 12,
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "price": 1500000,
+    "description": "Modern residential apartment"
+  }
+]

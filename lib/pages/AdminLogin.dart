@@ -1,29 +1,28 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class DarkSignInPage extends StatefulWidget {
-  const DarkSignInPage({super.key});
+class AdminLoginPage extends StatefulWidget {
+  const AdminLoginPage({super.key});
 
   @override
-  State<DarkSignInPage> createState() => _DarkSignInPageState();
+  State<AdminLoginPage> createState() => _AdminLoginPageState();
 }
 
-class _DarkSignInPageState extends State<DarkSignInPage> {
-  final TextEditingController _emailController = TextEditingController();
+class _AdminLoginPageState extends State<AdminLoginPage> {
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+  Future<void> _handleAdminLogin() async {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       _showMessage('Please fill in all fields', isError: true);
       return;
     }
@@ -34,27 +33,27 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/api/login'),
+        Uri.parse('http://127.0.0.1:8000/api/admin/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'email': _emailController.text,
+          'username': _usernameController.text,
           'password': _passwordController.text,
         }),
       );
 
+      print('Admin login response: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
         if (mounted) {
-          Navigator.pushReplacementNamed(
-            context,
-            '/home',
-            arguments: _emailController.text.split('@')[0],
-          );
+          print('Navigating to admin dashboard...');
+          Navigator.pushReplacementNamed(context, '/admin/dashboard');
         }
       } else {
-        _showMessage('Login failed. Please try again.', isError: true);
+        _showMessage('Invalid admin credentials', isError: true);
       }
     } catch (e) {
+      print('Admin login error: $e');
       _showMessage(
         'Connection error. Make sure the backend is running.',
         isError: true,
@@ -72,8 +71,8 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: Duration(seconds: 3),
+        backgroundColor: isError ? Colors.red : const Color(0xFF32CD32),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -82,6 +81,14 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -108,13 +115,13 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
-                  Icons.lock_outline,
+                  Icons.admin_panel_settings,
                   size: 80,
                   color: Color(0xFF32CD32),
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "Sign In",
+                  "Admin Panel",
                   style: TextStyle(
                     color: Colors.black87,
                     fontSize: 28,
@@ -122,15 +129,11 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                _email(),
+                _username(),
                 const SizedBox(height: 15),
                 _password(),
                 const SizedBox(height: 25),
-                _navigationText(context),
-                const SizedBox(height: 10),
-                _login(),
-                const SizedBox(height: 15),
-                _adminLink(context),
+                _loginButton(),
               ],
             ),
           ),
@@ -139,12 +142,12 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
     );
   }
 
-  SizedBox _login() {
+  SizedBox _loginButton() {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleLogin,
+        onPressed: _isLoading ? null : _handleAdminLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF32CD32),
           foregroundColor: Colors.white,
@@ -153,7 +156,7 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
           ),
         ),
         child: _isLoading
-            ? SizedBox(
+            ? const SizedBox(
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
@@ -162,28 +165,9 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
                 ),
               )
             : const Text(
-                "Login",
+                "Admin Login",
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
-      ),
-    );
-  }
-
-  RichText _navigationText(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        text: "Don't Have an account? ",
-        style: TextStyle(color: Colors.white),
-        children: [
-          TextSpan(
-            text: " Sign Up",
-            style: TextStyle(color: Colors.tealAccent),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                Navigator.pushNamed(context, '/signup');
-              },
-          ),
-        ],
       ),
     );
   }
@@ -212,14 +196,14 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
     );
   }
 
-  TextField _email() {
+  TextField _username() {
     return TextField(
-      controller: _emailController,
+      controller: _usernameController,
       style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
-        labelText: "Email",
+        labelText: "Username",
         labelStyle: const TextStyle(color: Colors.black54),
-        prefixIcon: const Icon(Icons.email, color: Color(0xFF32CD32)),
+        prefixIcon: const Icon(Icons.person, color: Color(0xFF32CD32)),
         filled: true,
         fillColor: Colors.grey[100],
         enabledBorder: OutlineInputBorder(
@@ -231,22 +215,6 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
           borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-
-  Widget _adminLink(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        Navigator.pushNamed(context, '/admin/login');
-      },
-      child: const Text(
-        'Admin Login',
-        style: TextStyle(
-          color: Colors.black54,
-          fontSize: 14,
-          decoration: TextDecoration.underline,
-        ),
       ),
     );
   }
