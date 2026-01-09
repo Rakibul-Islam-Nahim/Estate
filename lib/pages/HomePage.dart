@@ -16,9 +16,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFE5E5E5),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFE5E5E5),
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
@@ -48,7 +50,7 @@ class _HomePageState extends State<HomePage> {
       body: _buildBody(),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFFE5E5E5),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.2),
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage> {
             }
           },
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
+          backgroundColor: const Color(0xFFE5E5E5),
           selectedItemColor: Color(0xFF9ACD32),
           unselectedItemColor: Colors.grey[400],
           selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
@@ -185,7 +187,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFDCDCDC),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

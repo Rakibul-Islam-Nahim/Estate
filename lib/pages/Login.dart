@@ -85,7 +85,7 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/realState.jpg"),
+            image: AssetImage("assets/cityScape.png"),
             fit: BoxFit.fill,
           ),
         ),
@@ -94,10 +94,14 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
             width: 340,
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
-              color: Colors.grey[900],
+              color: const Color(0xFFDCDCDC).withOpacity(0.95),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 10),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
               ],
             ),
             child: Column(
@@ -106,13 +110,13 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
                 const Icon(
                   Icons.lock_outline,
                   size: 80,
-                  color: Colors.blueAccent,
+                  color: Color(0xFF32CD32),
                 ),
                 const SizedBox(height: 20),
                 const Text(
                   "Sign In",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black87,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -140,7 +144,8 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _handleLogin,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: const Color(0xFF32CD32),
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -185,13 +190,21 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
     return TextField(
       controller: _passwordController,
       obscureText: true,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: "Password",
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.lock, color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: const Icon(Icons.lock, color: Color(0xFF32CD32)),
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: Colors.grey[100],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -200,13 +213,21 @@ class _DarkSignInPageState extends State<DarkSignInPage> {
   TextField _email() {
     return TextField(
       controller: _emailController,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: "Email",
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.email, color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: const Icon(Icons.email, color: Color(0xFF32CD32)),
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: Colors.grey[100],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );

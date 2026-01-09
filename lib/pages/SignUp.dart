@@ -103,7 +103,7 @@ class _SignupState extends State<signup> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/realState.jpg"),
+            image: AssetImage("assets/cityScape.png"),
             fit: BoxFit.fill,
           ),
         ),
@@ -113,12 +113,24 @@ class _SignupState extends State<signup> {
               width: 340,
               padding: const EdgeInsets.all(30),
               decoration: BoxDecoration(
-                color: Colors.grey[900],
+                color: const Color(0xFFDCDCDC).withOpacity(0.95),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFF32CD32).withOpacity(0.3),
+                  width: 2,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.5),
-                    blurRadius: 10,
+                    blurRadius: 25,
+                    spreadRadius: 5,
+                    offset: const Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: const Color(0xFF32CD32).withOpacity(0.2),
+                    blurRadius: 20,
+                    spreadRadius: 3,
+                    offset: const Offset(0, 0),
                   ),
                 ],
               ),
@@ -128,13 +140,13 @@ class _SignupState extends State<signup> {
                   const Icon(
                     Icons.lock_open_outlined,
                     size: 80,
-                    color: Colors.blueAccent,
+                    color: Color(0xFF32CD32),
                   ),
                   const SizedBox(height: 20),
                   const Text(
                     "Sign Up",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black87,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
@@ -166,11 +178,14 @@ class _SignupState extends State<signup> {
     return RichText(
       text: TextSpan(
         text: "Already Have an Account? ",
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.black87),
         children: [
           TextSpan(
             text: " Sign In",
-            style: TextStyle(color: Colors.tealAccent),
+            style: TextStyle(
+              color: const Color(0xFF32CD32),
+              fontWeight: FontWeight.bold,
+            ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Navigator.pushNamed(context, '/');
@@ -185,13 +200,21 @@ class _SignupState extends State<signup> {
     return TextField(
       controller: _confirmPasswordController,
       obscureText: true,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: "Confirm Password",
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.lock, color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: const Icon(Icons.lock, color: Color(0xFF32CD32)),
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: Colors.grey[100],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -200,13 +223,21 @@ class _SignupState extends State<signup> {
   TextField _address() {
     return TextField(
       controller: _addressController,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: "Address",
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.location_city, color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: const Icon(Icons.location_city, color: Color(0xFF32CD32)),
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: Colors.grey[100],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -215,13 +246,21 @@ class _SignupState extends State<signup> {
   TextField _userName() {
     return TextField(
       controller: _userNameController,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: "User Name",
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.person, color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: const Icon(Icons.person, color: Color(0xFF32CD32)),
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: Colors.grey[100],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -234,7 +273,8 @@ class _SignupState extends State<signup> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _handleSignUp,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: const Color(0xFF32CD32),
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -260,13 +300,21 @@ class _SignupState extends State<signup> {
     return TextField(
       controller: _passwordController,
       obscureText: true,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: "Password",
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.lock, color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: const Icon(Icons.lock, color: Color(0xFF32CD32)),
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: Colors.grey[100],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -275,13 +323,21 @@ class _SignupState extends State<signup> {
   TextField _emailField() {
     return TextField(
       controller: _emailController,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: "Email",
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.email, color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: const Icon(Icons.email, color: Color(0xFF32CD32)),
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: Colors.grey[100],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF32CD32), width: 2),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
